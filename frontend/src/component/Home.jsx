@@ -11,7 +11,7 @@ const Home = () => {
     <div className="min-h-screen bg-gradient-to-b from-pink-50 via-white to-pink-50">
 
       {/* Navbar */}
-      <Navbar />
+      <Navbar  className="sticky top-0 z-50 bg-white shadow-md"/>
 
       {/* Hero Section */}
         <Hero />

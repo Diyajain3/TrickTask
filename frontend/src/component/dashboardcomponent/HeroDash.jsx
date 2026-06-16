@@ -3,7 +3,7 @@ import { Square, SquareCheckBig, Trash2 } from "lucide-react";
 import { useState } from "react";
 import React from "react";
 
-const HeroDash = ({ tasks, setTasks, filter }) => {
+const HeroDash = ({ tasks, setTasks, filter,setSelectedCategory ,setActivePage}) => {
   const toggleTask = (id) => {
     setTasks(
       tasks.map((task) =>
@@ -27,9 +27,16 @@ const HeroDash = ({ tasks, setTasks, filter }) => {
   );
 
   const completedTasks = tasks.filter((task) => task.completed);
+
+ 
   return (
     <div className="min-h-screen space-y-6 overflow-y-auto bg-pink-50 p-4 md:p-8">
-      <NavDash tasks={tasks} setTasks={setTasks} filter={filter} />
+      <NavDash
+  tasks={tasks}
+  setTasks={setTasks}
+  setSelectedCategory={setSelectedCategory}
+  setActivePage={setActivePage}
+/>
 
       {/* Overdue Section */}
       <div className="rounded-3xl border border-pink-100 bg-white p-5 shadow-md">
