@@ -1,52 +1,34 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Sidebar from "./dashboardcomponent/Sidebar";
 import HeroDash from "./dashboardcomponent/HeroDash";
 import AllTask from "./dashboardcomponent/AllTask";
 import CalendarPage from "./dashboardcomponent/CalendarPage";
 import Category from "./dashboardcomponent/Category";
+import api from "../api/axios";
+import { Menu } from "lucide-react";
 
 const DashBoard = () => {
   const [filter, setFilter] = useState("all");
   const [selectedCategory, setSelectedCategory] = useState("");
   const [activePage, setActivePage] = useState("dashboard");
+  const [tasks, setTasks] = useState([]);
+  const [mobileOpen, setMobileOpen] = useState(false);
 
-  const [tasks, setTasks] = useState([
-    {
-      id: 1,
-      title: "Code Review Session",
-      category: "Work",
-      dueDate: "2026-05-29",
-      completed: false,
-    },
-    {
-      id: 2,
-      title: "Complete Dashboard UI",
-      category: "Work",
-      dueDate: "2026-06-09",
-      completed: false,
-    },
-    {
-      id: 3,
-      title: "Submit Project Report",
-      category: "Personal",
-      dueDate: "2026-06-09",
-      completed: false,
-    },
-    {
-      id: 4,
-      title: "Code Review Session",
-      category: "Meeting",
-      dueDate: "2026-05-29",
-      completed: false,
-    },
-    {
-      id: 5,
-      title: "Code Review Session",
-      category: "Urgent",
-      dueDate: "2026-05-29",
-      completed: false,
-    },
-  ]);
+  useEffect(() => {
+    const fetchTasks = async () => {
+      try {
+        const response = await api.get("/tasks");
+        const formatted = response.data.map((task) => ({
+          ...task,
+          dueDate: task.dueDate ? task.dueDate.split("T")[0] : "No date",
+        }));
+        setTasks(formatted);
+      } catch (err) {
+        console.error("Error fetching tasks:", err);
+      }
+    };
+    fetchTasks();
+  }, []);
 
   return (
     <div className="flex h-screen overflow-hidden">
@@ -55,9 +37,23 @@ const DashBoard = () => {
         setFilter={setFilter}
         setActivePage={setActivePage}
         setSelectedCategory={setSelectedCategory}
+        mobileOpen={mobileOpen}
+        setMobileOpen={setMobileOpen}
       />
 
-      <main className="flex-1 overflow-y-auto bg-pink-50">
+      <main className="flex-1 overflow-y-auto bg-pink-50 flex flex-col">
+        {/* Mobile Header Bar */}
+        <div className="flex items-center justify-between bg-white border-b border-pink-100 px-6 py-4 md:hidden">
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => setMobileOpen(true)}
+              className="text-pink-500 hover:text-pink-600 focus:outline-none"
+            >
+              <Menu size={26} />
+            </button>
+            <h1 className="text-xl font-bold text-gray-800">TrickTask</h1>
+          </div>
+        </div>
         {activePage === "dashboard" && (
           <HeroDash
   tasks={tasks}

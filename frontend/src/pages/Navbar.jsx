@@ -4,6 +4,7 @@ import Logo from "../component/Logo";
 
 const Navbar = () => {
   const [open, setOpen] = useState(false);
+  const token = localStorage.getItem("token");
 
   return (
     <nav className="relative w-full bg-white px-6 py-4 shadow-md flex items-center justify-between z-50">
@@ -23,9 +24,15 @@ const Navbar = () => {
         <a className="hover:text-pink-600 cursor-pointer" href="#feed">
           Feedback
         </a>
-        <a className="hover:text-pink-600 cursor-pointer border border-pink-600 py-1 px-3 rounded-lg" href="login">
-          Login
-        </a>
+        {token ? (
+          <a className="hover:text-pink-600 cursor-pointer border border-pink-600 py-1 px-3 rounded-lg" href="/dashboard">
+            Dashboard
+          </a>
+        ) : (
+          <a className="hover:text-pink-600 cursor-pointer border border-pink-600 py-1 px-3 rounded-lg" href="/login">
+            Login
+          </a>
+        )}
       </div>
 
       {/* Mobile Icon */}
@@ -50,9 +57,15 @@ const Navbar = () => {
           <a className="hover:text-pink-600 cursor-pointer" href="#feed">
             Feedback
           </a>
-          <a className="cursor-pointer border border-pink-600 py-1 px-3 rounded-lg" href="#login">
-          Login
-        </a>
+          {token ? (
+            <a className="cursor-pointer border border-pink-600 py-1 px-3 rounded-lg" href="/dashboard">
+              Dashboard
+            </a>
+          ) : (
+            <a className="cursor-pointer border border-pink-600 py-1 px-3 rounded-lg" href="/login">
+              Login
+            </a>
+          )}
         </div>
       )}
     </nav>

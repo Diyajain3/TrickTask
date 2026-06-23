@@ -56,7 +56,7 @@ const CalendarPage = ({ tasks }) => {
 
       <div className="flex flex-col gap-6 xl:grid xl:grid-cols-3">
         {/* Calendar */}
-        <div className="lg:col-span-2 rounded-3xl bg-white p-5 shadow-md">
+        <div className="xl:col-span-2 rounded-3xl bg-white p-5 shadow-md">
           <h2 className="mb-6 text-2xl font-bold text-pink-500">
             {today.toLocaleString("default", {
               month: "long",
@@ -91,7 +91,7 @@ const CalendarPage = ({ tasks }) => {
                 return (
                   <div
                     key={index}
-                    className="h-24"
+                    className="h-14 sm:h-20 md:h-24"
                   ></div>
                 );
               }
@@ -155,7 +155,7 @@ sm:text-sm
                   {dayTasks.length > 0 && (
                     <div className="mt-2">
                       <span className="rounded-full bg-pink-500 px-1.5 py-0.5 text-[10px] sm:text-xs text-white">
-                        {dayTasks.length} Task
+                        {dayTasks.length} <span className="hidden sm:inline">Task</span>
                       </span>
                     </div>
                   )}
@@ -190,7 +190,7 @@ sm:p-4
             <div className="space-y-3">
               {selectedTasks.map((task) => (
                 <div
-                  key={task.id}
+                  key={task._id}
                   className="rounded-2xl border border-pink-100 p-4"
                 >
                   <h3 className="text-base text-black">

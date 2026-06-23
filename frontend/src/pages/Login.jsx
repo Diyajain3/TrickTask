@@ -1,10 +1,49 @@
 import { Lock, Mail } from "lucide-react";
-import React from "react";
+import React, {useState} from "react";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
+import api from "../api/axios";
 
 const Login = () => {
-  const navigate=useNavigate();
+
+  const navigate = useNavigate();
+    const [email, setEmail] = useState("");
+    const [password, setPassword] = useState("");
+    const [error, setError] = useState("");
+    const [loading, setLoading] = useState(false);
+
+     const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError("");
+
+    if ( !email.trim() || !password.trim()) {
+      setError("All fields are required.");
+      return;
+    }
+
+    setLoading(true);
+    try {
+     const response = await api.post("/users/login", {
+  email,
+  password,
+});
+
+localStorage.setItem("token", response.data.token);
+localStorage.setItem(
+  "user",
+  JSON.stringify(response.data.user)
+);
+
+navigate("/dashboard");
+    } catch (err) {
+      console.error("Login error:", err);
+      setError(
+        err.response?.data?.message || "Something went wrong. Please try again."
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-rose-100 via-pink-50 to-fuchsia-100 px-6 overflow-hidden relative">
 
@@ -83,12 +122,24 @@ const Login = () => {
           >
             Welcome Back 👋
           </motion.h2>
+            
 
-          <p className="text-gray-500 mt-3 mb-10">
+            {error && (
+                        <motion.div
+                          initial={{ opacity: 0, y: -10 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          className="bg-red-50 text-red-600 text-sm p-4 rounded-2xl border border-red-100 mb-6 animate-pulse"
+                        >
+                          ⚠️ {error}
+                        </motion.div>
+                      )}
+
+
+          <p  className="text-gray-500 mt-3 mb-10">
             Login to continue your productivity journey.
           </p>
 
-          <form className="flex flex-col gap-6">
+          <form  onSubmit={handleSubmit} className="flex flex-col gap-6"> 
 
             {/* Email */}
             <motion.div
@@ -107,6 +158,9 @@ const Login = () => {
                 type="email"
                 id="email"
                 placeholder="Enter your email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
                 className="w-full bg-white border border-pink-100 rounded-2xl px-5 py-3 outline-none focus:border-pink-400 focus:ring-4 focus:ring-pink-100 transition-all"
               />
             </motion.div>
@@ -128,29 +182,22 @@ const Login = () => {
                 type="password"
                 id="pass"
                 placeholder="Enter your password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
                 className="w-full bg-white border border-pink-100 rounded-2xl px-5 py-3 outline-none focus:border-pink-400 focus:ring-4 focus:ring-pink-100 transition-all"
               />
             </motion.div>
 
-            {/* Forgot Password */}
-            <div className="flex justify-end">
-              <p className="text-sm text-pink-500 font-medium cursor-pointer hover:text-pink-600 transition">
-                Forgot Password?
-              </p>
-            </div>
-
             {/* Login Button */}
             <motion.button
-              whileHover={{
-                scale: 1.04,
-              }}
-              whileTap={{
-                scale: 0.96,
-              }}
+               whileHover={!loading ? { scale: 1.04 } : {}}
+              whileTap={!loading ? { scale: 0.96 } : {}}
               type="submit"
+              disabled={loading}
               className="bg-gradient-to-r from-pink-500 to-fuchsia-500 text-white py-3 rounded-2xl font-bold text-lg shadow-lg hover:shadow-pink-300/50 transition-all"
             >
-              Login
+               {loading ? "Logging into Account..." : "Log in"}
             </motion.button>
 
           </form>

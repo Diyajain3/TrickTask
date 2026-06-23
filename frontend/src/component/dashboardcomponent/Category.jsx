@@ -1,25 +1,36 @@
 import React from "react";
 import { Square, SquareCheckBig, Trash2 } from "lucide-react";
+import api from "../../api/axios";
 
 const Category = ({
   tasks,
   setTasks,
   selectedCategory,
 }) => {
-  const toggleTask = (id) => {
-    setTasks(
-      tasks.map((task) =>
-        task.id === id
-          ? { ...task, completed: !task.completed }
-          : task
-      )
-    );
+  const toggleTask = async (id) => {
+    try {
+      await api.patch(`/tasks/${id}/toggle`);
+      setTasks(
+        tasks.map((task) =>
+          task._id === id
+            ? { ...task, completed: !task.completed }
+            : task
+        )
+      );
+    } catch (err) {
+      console.error("Error toggling task:", err);
+    }
   };
 
-  const deleteTask = (id) => {
-    setTasks(
-      tasks.filter((task) => task.id !== id)
-    );
+  const deleteTask = async (id) => {
+    try {
+      await api.delete(`/tasks/${id}`);
+      setTasks(
+        tasks.filter((task) => task._id !== id)
+      );
+    } catch (err) {
+      console.error("Error deleting task:", err);
+    }
   };
 
   const filteredTasks = tasks.filter(
@@ -59,8 +70,8 @@ const Category = ({
         ) : (
           filteredTasks.map((task) => (
             <div
-              key={task.id}
-              onClick={() => toggleTask(task.id)}
+              key={task._id}
+              onClick={() => toggleTask(task._id)}
               className="mb-3 flex cursor-pointer flex-col gap-4 rounded-2xl border border-pink-100 bg-white px-5 py-4 transition-all duration-300 hover:border-pink-300 hover:shadow-md sm:flex-row sm:items-center sm:justify-between"
             >
               {/* Left Side */}
@@ -106,7 +117,7 @@ const Category = ({
                 className="text-pink-400 transition hover:text-red-500"
                 onClick={(e) => {
                   e.stopPropagation();
-                  deleteTask(task.id);
+                  deleteTask(task._id);
                 }}
               />
             </div>

@@ -1,5 +1,6 @@
 import { Filter, PlusIcon } from "lucide-react";
 import React, { useState } from "react";
+import api from "../../api/axios";
 
 const NavDash = ({
   tasks,
@@ -99,7 +100,7 @@ const NavDash = ({
         )
         .map((task) => (
           <div
-            key={task.id}
+            key={task._id}
             className="rounded-xl border border-pink-100 bg-pink-50 p-2"
           >
             <p className="text-sm font-medium text-gray-700">
@@ -171,7 +172,7 @@ const NavDash = ({
 
               <button
                 className="w-full rounded-xl bg-pink-500 py-3 font-medium text-white transition hover:bg-pink-600"
-                onClick={() => {
+                onClick={async () => {
                   const title =
                     document.getElementById("title").value;
                   const category =
@@ -181,18 +182,29 @@ const NavDash = ({
 
                   if (!title.trim()) return;
 
-                  setTasks((prev) => [
-                    ...prev,
-                    {
-                      id: Date.now(),
+                  try {
+                    const response = await api.post("/tasks/create", {
                       title,
                       category,
                       dueDate,
-                      completed: false,
-                    },
-                  ]);
+                    });
 
-                  setForm(false);
+                    const created = response.data.task;
+                    if (created.dueDate) {
+                      created.dueDate = created.dueDate.split("T")[0];
+                    } else {
+                      created.dueDate = "No date";
+                    }
+
+                    setTasks((prev) => [
+                      ...prev,
+                      created,
+                    ]);
+
+                    setForm(false);
+                  } catch (err) {
+                    console.error("Error creating task:", err);
+                  }
                 }}
               >
                 Add Task

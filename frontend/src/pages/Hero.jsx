@@ -1,7 +1,19 @@
 import { CheckSquare } from "lucide-react";
 import React from "react";
+import { useNavigate } from "react-router-dom";
 
 const Hero = () => {
+  const navigate = useNavigate();
+  const token = localStorage.getItem("token");
+
+  const handleGetStarted = () => {
+    if (token) {
+      navigate("/dashboard");
+    } else {
+      navigate("/signup");
+    }
+  };
+
   return (
     <div id="hero"  className="w-full min-h-[90vh] flex items-center justify-center px-6 bg-gradient-to-br from-pink-50 via-white to-pink-100">
 
@@ -34,7 +46,7 @@ const Hero = () => {
         {/* Buttons */}
         <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
 
-          <button className="px-7 py-3 rounded-xl bg-pink-600 text-white font-semibold shadow-lg hover:shadow-pink-300 hover:scale-105 transition-all duration-300">
+          <button onClick={handleGetStarted} className="px-7 py-3 rounded-xl bg-pink-600 text-white font-semibold shadow-lg hover:shadow-pink-300 hover:scale-105 transition-all duration-300">
             Get Started
           </button>
 

@@ -1,11 +1,36 @@
 import { Lock, Mail, User } from "lucide-react";
-import React from "react";
+import React, { useState } from "react";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
+import api from "../api/axios";
 
 const Signup = () => {
-
   const navigate = useNavigate();
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      const response = await api.post("/users/signup", {
+  name,
+  email,
+  password,
+});
+
+localStorage.setItem("token", response.data.token);
+localStorage.setItem(
+  "user",
+  JSON.stringify(response.data.user)
+);
+
+navigate("/dashboard");
+    } catch (err) {
+      console.error("Signup error:", err);
+      alert(err.response?.data?.message || "Signup failed. Please try again.");
+    }
+  };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-rose-100 via-pink-50 to-fuchsia-100 px-6 overflow-hidden relative">
@@ -78,7 +103,7 @@ const Signup = () => {
             Join TrickTask and boost your productivity.
           </p>
 
-          <form className="flex flex-col gap-6">
+          <form onSubmit={handleSubmit} className="flex flex-col gap-6">
 
             {/* Username */}
             <motion.div
@@ -97,6 +122,8 @@ const Signup = () => {
                 type="text"
                 id="name"
                 placeholder="Enter your name"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
                 className="w-full bg-white border border-pink-100 rounded-2xl px-5 py-3 outline-none focus:border-pink-400 focus:ring-4 focus:ring-pink-100 transition-all"
               />
             </motion.div>
@@ -118,6 +145,8 @@ const Signup = () => {
                 type="email"
                 id="email"
                 placeholder="Enter your email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
                 className="w-full bg-white border border-pink-100 rounded-2xl px-5 py-3 outline-none focus:border-pink-400 focus:ring-4 focus:ring-pink-100 transition-all"
               />
             </motion.div>
@@ -139,6 +168,8 @@ const Signup = () => {
                 type="password"
                 id="pass"
                 placeholder="Create password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
                 className="w-full bg-white border border-pink-100 rounded-2xl px-5 py-3 outline-none focus:border-pink-400 focus:ring-4 focus:ring-pink-100 transition-all"
               />
             </motion.div>
