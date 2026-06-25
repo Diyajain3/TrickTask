@@ -4,7 +4,7 @@ import Hero from "../pages/Hero";
 import About from "../pages/About";
 import Categories from "../pages/Categories";
 import Feedback from "../pages/Feedback";
-import Footer from "../pages/footer";
+import Footer from "../pages/Footer";
 
 const Home = () => {
   return (
