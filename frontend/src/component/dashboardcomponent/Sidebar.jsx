@@ -229,7 +229,7 @@ const Sidebar = ({
             {current && (
               <div>
                 <p className="text-sm font-medium text-black">
-                  Diya
+                  {user.name}
                 </p>
 
                 <p className="text-xs text-gray-500">
