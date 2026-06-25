@@ -4,6 +4,7 @@ import dotenv from "dotenv";
 import dns from "dns";
 import path from "path";
 import { fileURLToPath } from "url";
+import mongoose from "mongoose";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -21,6 +22,16 @@ const app = express();
 
 app.use(cors());
 app.use(express.json());
+
+// Prevent long buffering queries if database connection is offline/failed
+app.use("/api", (req, res, next) => {
+  if (mongoose.connection.readyState === 0 || mongoose.connection.readyState === 3) {
+    return res.status(503).json({
+      message: "Database is currently offline. Please check if MONGO_URI is set correctly in your environment variables.",
+    });
+  }
+  next();
+});
 
 app.use("/api/users", userRouter);
 app.use("/api/tasks", taskRouter);
