@@ -1,5 +1,6 @@
 import { Mail, Phone, CheckCircle } from "lucide-react";
 import React, { useState } from "react";
+import emailjs from "@emailjs/browser";
 
 const Feedback = () => {
   const [name, setName] = useState("");
@@ -19,23 +20,23 @@ const Feedback = () => {
     setLoading(true);
     setStatus(null);
 
+    const serviceId =
+      import.meta.env.VITE_EMAILJS_SERVICE_ID || "service_hnt2gcf";
+    const templateId =
+      import.meta.env.VITE_EMAILJS_TEMPLATE_ID || "template_cftnczy";
+    const publicKey =
+      import.meta.env.VITE_EMAILJS_PUBLIC_KEY || "dl0OWI_gm9J7B9b5e";
+
+    const templateParams = {
+      from_name: name,
+      from_email: email,
+      name: name,
+      email: email,
+      message: message,
+    };
+
     try {
-      // Check if EmailJS keys are configured in env
-      const serviceId = import.meta.env.VITE_EMAILJS_SERVICE_ID;
-      const templateId = import.meta.env.VITE_EMAILJS_TEMPLATE_ID;
-      const publicKey = import.meta.env.VITE_EMAILJS_PUBLIC_KEY;
-
-      if (serviceId && templateId && publicKey && !serviceId.includes("your_")) {
-        // Dynamic import if emailjs package is available
-        const emailjs = await import("@emailjs/browser");
-        await emailjs.send(
-          serviceId,
-          templateId,
-          { name, email, message },
-          publicKey
-        );
-      }
-
+      await emailjs.send(serviceId, templateId, templateParams, publicKey);
       setStatus({
         type: "success",
         message: "Thank you! Your feedback has been submitted successfully. 💖",
@@ -44,14 +45,11 @@ const Feedback = () => {
       setEmail("");
       setMessage("");
     } catch (err) {
-      console.error("Feedback error:", err);
+      console.error("EmailJS Error:", err);
       setStatus({
-        type: "success",
-        message: "Thank you for your feedback! 💖",
+        type: "error",
+        message: "Failed to send feedback. Please try again.",
       });
-      setName("");
-      setEmail("");
-      setMessage("");
     } finally {
       setLoading(false);
     }
