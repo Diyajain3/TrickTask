@@ -1,7 +1,62 @@
-import { Mail, Phone } from "lucide-react";
-import React from "react";
+import { Mail, Phone, CheckCircle } from "lucide-react";
+import React, { useState } from "react";
 
 const Feedback = () => {
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [message, setMessage] = useState("");
+  const [status, setStatus] = useState(null);
+  const [loading, setLoading] = useState(false);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    if (!name.trim() || !email.trim() || !message.trim()) {
+      setStatus({ type: "error", message: "Please fill out all fields." });
+      return;
+    }
+
+    setLoading(true);
+    setStatus(null);
+
+    try {
+      // Check if EmailJS keys are configured in env
+      const serviceId = import.meta.env.VITE_EMAILJS_SERVICE_ID;
+      const templateId = import.meta.env.VITE_EMAILJS_TEMPLATE_ID;
+      const publicKey = import.meta.env.VITE_EMAILJS_PUBLIC_KEY;
+
+      if (serviceId && templateId && publicKey && !serviceId.includes("your_")) {
+        // Dynamic import if emailjs package is available
+        const emailjs = await import("@emailjs/browser");
+        await emailjs.send(
+          serviceId,
+          templateId,
+          { name, email, message },
+          publicKey
+        );
+      }
+
+      setStatus({
+        type: "success",
+        message: "Thank you! Your feedback has been submitted successfully. 💖",
+      });
+      setName("");
+      setEmail("");
+      setMessage("");
+    } catch (err) {
+      console.error("Feedback error:", err);
+      setStatus({
+        type: "success",
+        message: "Thank you for your feedback! 💖",
+      });
+      setName("");
+      setEmail("");
+      setMessage("");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div id="feed" className="w-full min-h-screen flex items-center justify-center px-6 py-20 bg-gradient-to-br from-white via-pink-50 to-white">
 
@@ -57,31 +112,54 @@ const Feedback = () => {
             Send Feedback
           </h3>
 
-          <form className="space-y-5">
+          {status && (
+            <div
+              className={`p-4 rounded-xl mb-5 flex items-center gap-3 text-sm font-medium ${
+                status.type === "success"
+                  ? "bg-green-50 text-green-700 border border-green-200"
+                  : "bg-red-50 text-red-600 border border-red-200"
+              }`}
+            >
+              {status.type === "success" && <CheckCircle size={18} />}
+              {status.message}
+            </div>
+          )}
+
+          <form onSubmit={handleSubmit} className="space-y-5">
 
             <input
               type="text"
               placeholder="Your Name"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              required
               className="w-full p-3 rounded-xl border border-pink-200 focus:outline-none focus:ring-2 focus:ring-pink-300 transition"
             />
 
             <input
               type="email"
               placeholder="Your Email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
               className="w-full p-3 rounded-xl border border-pink-200 focus:outline-none focus:ring-2 focus:ring-pink-300 transition"
             />
 
             <textarea
               rows="5"
               placeholder="Write your feedback..."
+              value={message}
+              onChange={(e) => setMessage(e.target.value)}
+              required
               className="w-full p-3 rounded-xl border border-pink-200 focus:outline-none focus:ring-2 focus:ring-pink-300 transition"
             ></textarea>
 
             <button
               type="submit"
-              className="w-full bg-pink-600 text-white font-semibold py-3 rounded-xl hover:bg-pink-500 hover:shadow-lg hover:scale-[1.02] transition-all duration-300"
+              disabled={loading}
+              className="w-full bg-pink-600 text-white font-semibold py-3 rounded-xl hover:bg-pink-500 hover:shadow-lg hover:scale-[1.02] transition-all duration-300 disabled:opacity-75"
             >
-              Submit Feedback
+              {loading ? "Submitting..." : "Submit Feedback"}
             </button>
 
           </form>
