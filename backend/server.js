@@ -23,6 +23,12 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+// Auto-connect DB middleware for serverless invocations
+app.use(async (req, res, next) => {
+  await connectDB();
+  next();
+});
+
 // Prevent long buffering queries if database connection is offline/failed
 app.use("/api", (req, res, next) => {
   if (mongoose.connection.readyState === 0 || mongoose.connection.readyState === 3) {
@@ -36,15 +42,15 @@ app.use("/api", (req, res, next) => {
 app.use("/api/users", userRouter);
 app.use("/api/tasks", taskRouter);
 
-// Serve frontend static build files
-const frontendBuildPath = path.join(__dirname, "../frontend/dist");
-app.use(express.static(frontendBuildPath));
-
-// Fallback to React index.html for all non-API routes
-app.get("/*splat", (req, res) => {
-  res.sendFile(path.join(frontendBuildPath, "index.html"));
+// Root route check
+app.get("/", (req, res) => {
+  res.json({ message: "TrickTask Backend API is running on Vercel" });
 });
 
-app.listen(process.env.PORT || 5000, () => {
-  console.log("Server running");
-});
+if (process.env.NODE_ENV !== "production") {
+  app.listen(process.env.PORT || 5000, () => {
+    console.log("Server running");
+  });
+}
+
+export default app;
